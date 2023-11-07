@@ -7,9 +7,21 @@ async function connect() {
   console.log('Connected to Prisma database');
 }
 
-async function uploadStrokeData(strokedata) {
+async function uploadContractData(contractdata) {
   try {
     await prisma.contract.create({
+      data: contractdata,
+    });
+
+    return 'Stroke data uploaded successfully';
+  } catch (error) {
+    return 'Error uploading user data';
+  }
+}
+
+async function uploadStrokeData(strokedata) {
+  try {
+    await prisma.stroke.create({
       data: strokedata,
     });
 
@@ -19,7 +31,6 @@ async function uploadStrokeData(strokedata) {
   }
 }
 
-
 async function disconnect() {
   await prisma.$disconnect();
   console.log('Disconnected from Prisma database');
@@ -27,6 +38,7 @@ async function disconnect() {
 
 module.exports = {
   connect,
-  uploadStrokeData,
+  uploadContractData,
   disconnect,
+  uploadStrokeData
 };

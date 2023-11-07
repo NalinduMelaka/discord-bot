@@ -1,6 +1,6 @@
-const { ActionRowBuilder, Events, ModalBuilder, TextInputBuilder, TextInputStyle,Client, IntentsBitField } = require('discord.js');
+const { ActionRowBuilder, Events, ModalBuilder, TextInputBuilder, TextInputStyle,Client, IntentsBitField, InteractionCollector } = require('discord.js');
 require('dotenv').config();
-const { connect, uploadStrokeData, disconnect } = require('../action/dataUploader');
+const { connect, uploadContractData, disconnect,  uploadStrokeData } = require('../action/dataUploader');
 
 
 const client = new Client({
@@ -19,7 +19,7 @@ client.on('ready', () => {
 
 client.on('interactionCreate', async (interaction) => {
   if(interaction.isChatInputCommand()){
-			if (interaction.commandName === 'createcontract') {
+			if (interaction.commandName === 'contract') {
 				// Create the modal
 				const modal = new ModalBuilder()
 					.setCustomId('myModal')
@@ -134,6 +134,38 @@ client.on('interactionCreate', async (interaction) => {
 				const thirdActionRow = new ActionRowBuilder().addComponents(carelabelidinput);
 				modalfour.addComponents(firstActionRow,secondActionRow,thirdActionRow);
 				await interaction.showModal(modalfour);
+			}else if(interaction.commandName === 'quantity'){
+				const modalfive = new ModalBuilder()
+					.setCustomId('quantityModal')
+					.setTitle('Quantity data');
+				const colorcode = new TextInputBuilder()
+					.setCustomId('colorcode')
+					.setLabel("Color and Colorname use /to separate")
+					.setStyle(TextInputStyle.Short);
+				const upcsieze = new TextInputBuilder()
+					.setCustomId('upcsize')
+					.setLabel("Upc and Size use /to separate")
+					.setStyle(TextInputStyle.Short);
+				const ssizeprice = new TextInputBuilder()
+					.setCustomId('ssizeprice')
+					.setLabel("Secondarysize and price")
+					.setStyle(TextInputStyle.Short);
+			  const  orderqtys = new TextInputBuilder()
+					.setCustomId('orderqty')
+					.setLabel("Provide Order QTY")
+					.setStyle(TextInputStyle.Short);
+				const otherlableinput = new TextInputBuilder()
+				  .setCustomId('otherlableinput')
+					.setLabel("Provide the Other label id")
+					.setStyle(TextInputStyle.Short);
+				const firstActionRow = new ActionRowBuilder().addComponents(colorcode);
+				const secondActionRow = new ActionRowBuilder().addComponents(upcsieze);
+				const thirdActionRow = new ActionRowBuilder().addComponents(ssizeprice);
+				const forthActionRow = new ActionRowBuilder().addComponents(orderqtys);
+				const fifthActoinRow = new ActionRowBuilder().addComponents(otherlableinput);
+
+				modalfive.addComponents(firstActionRow,secondActionRow,thirdActionRow,forthActionRow,fifthActoinRow);
+				await interaction.showModal(modalfive);
 			}
 		}else if(interaction.isModalSubmit()){
 			if(interaction.customId == 'myModal'){
@@ -148,7 +180,7 @@ client.on('interactionCreate', async (interaction) => {
 				const prodescin = arrayoftow[0];
 				const strokein = arrayoftow[1];
 				await connect();
-				const strokedata = {
+				const contractdata = {
 					constractno: contract,
 					season: season,
 					stroke_desc: strokein,
@@ -156,7 +188,7 @@ client.on('interactionCreate', async (interaction) => {
 					tdept: tdept,
 					stroke_id: stroke
 				}
-				const resultup = await uploadStrokeData(strokedata);
+				const resultup = await uploadContractData(contractdata);
 				await disconnect();
 
         if(resultup ==='Stroke data uploaded successfully'){
@@ -164,7 +196,26 @@ client.on('interactionCreate', async (interaction) => {
 				}else{
 					await interaction.editReply({content:'Something wrong try again!'});
 				}
-				console.log(stroke,arrayoftow[0]);
+		
+			}else if(interaction.customId === 'strokeModal'){
+				await interaction.reply({ content:'we receved it processing'});
+				await connect();
+				const strokedata = {
+					strokeno: interaction.fields.getTextInputValue('strokeno'),
+				}
+				const result = await uploadStrokeData(strokedata);
+				await disconnect();
+				if(result ==='Stroke data uploaded successfully'){
+					await interaction.editReply({content:'successfuly database uploaded'});
+				}else{
+					await interaction.editReply({content:'Something wrong try again!'});
+				}
+			}else if(interaction.customId === 'careModal'){
+				await interaction.reply({ content:'we receved it processing'});
+			}else if(interaction.customId === 'otherModal'){
+				await interaction.reply({ content:'we receved it processing'});
+			}else if(interaction.customId === 'quantityModal'){
+				await interaction.reply({ content:'we receved it processing'});
 			}
 		}
 });
