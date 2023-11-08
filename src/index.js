@@ -1,6 +1,6 @@
 const { ActionRowBuilder, Events, ModalBuilder, TextInputBuilder, TextInputStyle,Client, IntentsBitField, InteractionCollector } = require('discord.js');
 require('dotenv').config();
-const { connect, uploadContractData, disconnect,  uploadStrokeData } = require('../action/dataUploader');
+const { connect, uploadContractData, disconnect,  uploadStrokeData, uploadcareData, uploadOtherData, uploadQuantityData } = require('../action/dataUploader');
 
 
 const client = new Client({
@@ -148,7 +148,7 @@ client.on('interactionCreate', async (interaction) => {
 					.setStyle(TextInputStyle.Short);
 				const ssizeprice = new TextInputBuilder()
 					.setCustomId('ssizeprice')
-					.setLabel("Secondarysize and price")
+					.setLabel("Secondarysize and price(number)")
 					.setStyle(TextInputStyle.Short);
 			  const  orderqtys = new TextInputBuilder()
 					.setCustomId('orderqty')
@@ -170,7 +170,7 @@ client.on('interactionCreate', async (interaction) => {
 		}else if(interaction.isModalSubmit()){
 			if(interaction.customId == 'myModal'){
 				//show the result
-				await interaction.reply({ content:'we receved it processing'});
+				await interaction.reply({ content:'we receved it processing 🖥️'});
 				
 				const stroke = interaction.fields.getTextInputValue('strokeinput').trim();
 				const contract = interaction.fields.getTextInputValue('contractinput').trim();
@@ -192,13 +192,13 @@ client.on('interactionCreate', async (interaction) => {
 				await disconnect();
 
         if(resultup ==='Stroke data uploaded successfully'){
-					await interaction.editReply({content:'successfuly database uploaded'});
+					await interaction.editReply({content:'successfuly database uploaded🙌'});
 				}else{
-					await interaction.editReply({content:'Something wrong try again!'});
+					await interaction.editReply({content:'Something wrong try again!😔'});
 				}
 		
 			}else if(interaction.customId === 'strokeModal'){
-				await interaction.reply({ content:'we receved it processing'});
+				await interaction.reply({ content:'we receved it processing 🖥️'});
 				await connect();
 				const strokedata = {
 					strokeno: interaction.fields.getTextInputValue('strokeno'),
@@ -206,16 +206,65 @@ client.on('interactionCreate', async (interaction) => {
 				const result = await uploadStrokeData(strokedata);
 				await disconnect();
 				if(result ==='Stroke data uploaded successfully'){
-					await interaction.editReply({content:'successfuly database uploaded'});
+					await interaction.editReply({content:'successfuly database uploaded🙌'});
 				}else{
-					await interaction.editReply({content:'Something wrong try again!'});
+					await interaction.editReply({content:'Something wrong try again!😔'});
 				}
 			}else if(interaction.customId === 'careModal'){
-				await interaction.reply({ content:'we receved it processing'});
+				await interaction.reply({ content:'we receved it processing 🖥️'});
+				await connect();
+				const caredata = {
+					ref_no: interaction.fields.getTextInputValue('refwash').split('/')[0],
+					wash_symbol: interaction.fields.getTextInputValue('refwash').split('/')[1],
+					fibre: interaction.fields.getTextInputValue('fiberzoo').split('/')[0],
+					zoordes: interaction.fields.getTextInputValue('fiberzoo').split('/')[1],
+					mpart_fw: interaction.fields.getTextInputValue('coompart').split('/')[1],
+					coo: interaction.fields.getTextInputValue('coompart').split('/')[0],
+					caretext: interaction.fields.getTextInputValue('caretextinput'),
+					contract_id: interaction.fields.getTextInputValue('contract'),
+				}
+				const result = await uploadcareData(caredata);
+				await disconnect();
+				if(result ==='Error uploading care data'){
+					await interaction.editReply({content:'Something wrong try again!😔'});
+				}else{
+					await interaction.editReply({content:`Successfuly database uploaded🙌. Care Id of that record is: ${result}`});
+				}
 			}else if(interaction.customId === 'otherModal'){
-				await interaction.reply({ content:'we receved it processing'});
+				await interaction.reply({ content:'we receved it processing 🖥️'});
+				await connect();
+				const otherdata = {
+					fef_no: interaction.fields.getTextInputValue('refno'),
+					label_type: interaction.fields.getTextInputValue('labeltype'),
+					carelabel_id: interaction.fields.getTextInputValue('carelabelidinput'),
+				}
+				const result = await uploadOtherData(otherdata);
+				await disconnect();
+				if(result ==='Error uploading other data'){
+					await interaction.editReply({content:'Something wrong try again!😔'});
+				}else{
+					await interaction.editReply({content:`Successfuly database uploaded🙌. Other Id of that record is: ${result}`});
+				}
 			}else if(interaction.customId === 'quantityModal'){
-				await interaction.reply({ content:'we receved it processing'});
+				await interaction.reply({ content:'we receved it processing 🖥️'});
+				await connect();
+				const quantitydata = {
+					color_code: interaction.fields.getTextInputValue('colorcode').split('/')[0],
+					color_name: interaction.fields.getTextInputValue('colorcode').split('/')[1],
+					upc_no: interaction.fields.getTextInputValue('upcsize').split('/')[0],
+					primary_size: interaction.fields.getTextInputValue('upcsize').split('/')[1],
+					secondary_size: interaction.fields.getTextInputValue('ssizeprice').split('/')[0],
+					selling_price: parseFloat(interaction.fields.getTextInputValue('ssizeprice').split('/')[1]),
+					order_qty: interaction.fields.getTextInputValue('orderqty'),
+					otherlabel_id: interaction.fields.getTextInputValue('otherlableinput'),
+				}
+				const result = await uploadQuantityData(quantitydata);
+				await disconnect();
+				if(result ==='Quntity data uploaded successfully'){
+					await interaction.editReply({content:'successfuly database uploaded🙌'});
+				}else{
+					await interaction.editReply({content:'Something wrong try again!😔'});
+				}
 			}
 		}
 });
