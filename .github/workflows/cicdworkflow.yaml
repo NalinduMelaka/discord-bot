@@ -13,7 +13,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
       - name: login to docer hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} 
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
       - name: build docker image
         run: docker build -t integrationninjas/nodejs-app .
       - name: Publish image to docker hub
