@@ -3,3 +3,20 @@ name: CLCD
 on: 
   push:
     branches:
+     - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: chekout sourse
+        uses: action/checkout@v3
+      - name: login to docer hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: build docker image
+        run: docker build -t integrationnmw/nodejs-app .
+      - name: Publish image to docker hub
+        run: docker push integrationnmw/nodejs-app:latest
+  deploy:
+    needs: build
+    runs-on:     
