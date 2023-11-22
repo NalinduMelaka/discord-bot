@@ -15,16 +15,16 @@ jobs:
       - name: login to docer hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }} 
       - name: build docker image
-        run: docker build -t nalindu/discord-bot .
+        run: docker build -t nalindu/ddd .
       - name: Publish image to docker hub
-        run: docker push nalindu/discord-bot:latest
+        run: docker push nalindu/ddd:latest
   deploy:
     needs: build
     runs-on: [aws-ec2]  
     steps:
       - name: pull image from docker hub
-        run: docker pull nalindu/discord-bot:latest
+        run: docker pull nalindu/ddd:latest
       - name: Delete old container
-        run: docker rm -f discord-bot-container
+        run: docker rm -f ddd-container
       - name: Run docker continer
-        run: docker run -d -p 3000:3000 --name discord-bot-container nalindu/discord-bot
+        run: docker run -d -p 3000:3000 --name ddd-container nalindu/ddd
